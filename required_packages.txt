@@ -1,0 +1,11 @@
+abind
+dotenv
+geomorph
+ggplot2
+MASS
+Morpho
+PMCMRplus
+scales
+xlsx
+extrafont
+showtext
