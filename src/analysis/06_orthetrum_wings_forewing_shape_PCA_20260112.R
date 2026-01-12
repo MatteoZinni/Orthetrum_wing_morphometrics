@@ -1,18 +1,25 @@
 ## ========================================================================== ##
-## Script:       06_orthetrum_wings_forewing_shape_PCA_20251126.              ##
+## Script:       06_orthetrum_wings_forewing_shape_PCA_20260112.              ##
 ## Author:       Matteo Zinni                                                 ##
-## Date:         2025-04-24                                                   ##
-## Description:  A geometric morphometrics approach to investigate            ##
-##               phylogenetic and taxonomic relationships among               ##
-##               several skimmer species. Forewing Shape Analysis - PCA.      ##
+## Date:         2026-01-12                                                   ##
+## Description:  A geometric morphometrics approach to investigate
+##               major axes of forewing shape variation in Orthetrum,
+##               and their taxonomic and biological meaning.
+##               Forewing shape analysis based on PCA of Procrustes-aligned data.
 ## ========================================================================== ##
 
 # 06.01.01.01 SHAPE ANALYSIS ---------------------------------------------------
 
 # Packages loading ----
-invisible(lapply(packages, function(pkg) {
-  library(pkg, character.only = TRUE)
-}))
+if (!requireNamespace("here", quietly = TRUE)) {
+  install.packages("here")
+}
+
+# Sourcing the function
+source(here::here("src", "functions", "packages_setup_20260111.R"))
+
+# Lunch the function
+install_packages()
 
 ## 06.02.01.01 PCA ON SHAPE DATA -----------------------------------------------
 
@@ -29,6 +36,15 @@ fwFdPCA_scores = as.data.frame(fwFdPCA$x)
 fwFdPCA_scores$Sex = forewing_2d$Sex
 fwFdPCA_scores$Species = forewing_2d$Species
 
+## PCA scores represent the projection of individual wing shapes
+## onto the principal axes of shape variation.
+## Statistical tests on PCA scores assess whether species or sexes
+## differ in their position along major shape axes.
+
+## Testing for sexual dimorphism along individual PCA axes.
+## These tests evaluate whether males and females occupy
+## different regions of the multivariate shape space.
+
 # Test for sex separation along PC1 
 kruskal.test(fwFdPCA_scores$Comp1 ~ fwFdPCA_scores$Sex)
 
@@ -37,6 +53,10 @@ kruskal.test(fwFdPCA_scores$Comp2 ~ fwFdPCA_scores$Sex)
 
 # Test for sex separation along PC3
 kruskal.test(fwFdPCA_scores$Comp3 ~ fwFdPCA_scores$Sex)
+
+## Testing for interspecific shape differentiation along PCA axes.
+## Significant differences indicate that species differ in
+## specific components of forewing shape variation.
 
 # Test for species separation along PC1 
 kruskal.test(fwFdPCA_scores$Comp1 ~ fwFdPCA_scores$Species)
@@ -59,11 +79,10 @@ kwAllPairsDunnTest(Comp2 ~ Species, data = fwFdPCA_scores,
 kwAllPairsDunnTest(Comp3 ~ Species, data = fwFdPCA_scores,
                    p.adjust.method = "bonferroni")
 
-plotRefToTarget(mshape(forewing_gpa$coords[,,specimen$Sex=="Male"]),
-                mshape(forewing_gpa$coords[,,specimen$Sex=="Female"]),
-                mag = 1,
-                links = fw_links)
-
+## PCA scatterplots visualize the distribution of specimens
+## in shape space defined by the first two principal components.
+## Clustering or separation of groups suggests shape similarity
+## or differentiation among species or sexes.
 
 # Scoreplot with ggplot2: Species
 ggplot2::ggplot(fwFdPCA_scores, aes(x=Comp1, y=Comp2, color = Species)) + 
@@ -81,12 +100,22 @@ ggplot2::ggplot(fwFdPCA_scores, aes(x=Comp1, y=Comp2, color = Sex)) +
 
 # Loadings
 
+## PCA loadings quantify the contribution of each landmark coordinate
+## to a given principal component.
+## High absolute loading values indicate landmarks that contribute
+## most strongly to shape variation along that axis.
+
 # extract data
 fwFdPCA_loadings = fwFdPCA$rotation
 
 # edit rownames
 rownames(fwFdPCA_loadings) = paste(rep(c("x","y"),20),
   c(paste(0, rep(1:9, each = 2),sep = ""), rep(10:20, each = 2)), sep = "")
+
+## Barplots of PCA loadings are used to identify which regions
+## of the forewing (landmarks) drive shape variation along each PC.
+## Positive and negative values indicate opposite directions
+## of shape change along the same axis.
 
 # plot loadings for first PC
 barplot(fwFdPCA_loadings[,1], las = 2, ylim = c(-0.6,0.6), 
@@ -102,6 +131,10 @@ barplot(fwFdPCA_loadings[,3], las = 2, ylim = c(-0.6,0.6),
 
 # Eigenvalues
 
+## Eigenvalues and screeplots are used to evaluate how much
+## shape variation is captured by each principal component,
+## and to decide how many PCs are biologically meaningful.
+
 # sd of the principal components (square roots of the eigenvalues)
 fwFdPCA_sdev = fwFdPCA$sdev
 
@@ -114,6 +147,11 @@ screeplot(fwFdPCA, type = "l", main = "PCA screeplot")
 # Variance explained and fidelity of representation
 fwFdPCA_vrnc = fwFdPCA$sdev^2
 fwFdPCA_vrnc_prop = fwFdPCA_vrnc/sum(fwFdPCA_vrnc)
+
+## The fidelity table summarizes the variance explained
+## by each PC and the cumulative proportion of shape variation.
+## This information is useful to justify the number of PCs
+## retained for interpretation and downstream analyses.
 
 fwFdPCA_fidelity = rbind(fwFdPCA_sdev,fwFdPCA_vrnc,
   fwFdPCA_vrnc_prop, cumsum(fwFdPCA_vrnc_prop))
@@ -292,6 +330,11 @@ abline(h=0)
 
 ## 06.02.02.01 SHAPE VARIATION -------------------------------------------------
 
+## Shape deformation visualizations illustrate the biological meaning
+## of PCA axes by mapping extreme shape changes back onto the mean shape.
+## These plots translate abstract PCA axes into interpretable
+## morphological transformations of the forewing.
+
 ### Shape Variation: max deformation across PCA axes ----
 
 # Setting graphic paramteres with gridpar
@@ -312,6 +355,10 @@ fwSp_ref <- mshape(fwSpOut_gpa$coords)
 fwSx_ref <- mshape(fwSxOut_gpa$coords)
 
 #### Maximum deformation as TPS ----  
+
+## Thin-Plate Spline (TPS) deformation grids visualize smooth,
+## continuous shape changes between the mean shape and
+## extreme PCA scores, highlighting overall bending and warping patterns.
 
 ##### Full dataset ----
 pc1_fwFd_max = fwFdPCA$shapes$shapes.comp1$max  
@@ -473,6 +520,11 @@ title(main="Forewing Orthetrum TPS",sub = "Max PC3")
 dev.off()
 
 #### Maximum deformation as Vector  ----
+
+## Vector plots represent landmark displacements directly,
+## emphasizing the direction and magnitude of local shape changes.
+## This representation is particularly useful to identify
+## which landmarks move the most along a PCA axis.
 
 ##### Full dataset ----
 
