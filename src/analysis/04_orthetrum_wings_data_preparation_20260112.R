@@ -1,7 +1,7 @@
 ## ========================================================================== ##
-## Script:      04_orthetrum_wings_data_preparation_20251227.R
+## Script:      04_orthetrum_wings_data_preparation_20260112.R
 ## Author:      Matteo Zinni
-## Date:        2026-01-03
+## Date:        2026-01-12
 ## Description: Prepare Orthetrum wing landmark data for analysis, including
 ##              GPA, outlier-filtered datasets, 2D array export, and creation
 ##              of geomorph data frames.
@@ -10,16 +10,19 @@
 # 04.01.01.01 DATA PREPARATION -------------------------------------------------
 
 # Packages loading ----
-message("Loading packages: ", paste(packages, collapse = ", "))
-invisible(lapply(packages, function(pkg) {
-  if (!requireNamespace(pkg, quietly = TRUE)) install.packages(pkg)
-  library(pkg, character.only = TRUE)
-}))
+if (!requireNamespace("here", quietly = TRUE)) {
+  install.packages("here")
+}
+
+# Sourcing the function
+source(here::here("src", "functions", "packages_setup_20260111.R"))
+
+# Lunch the function
+install_packages()
 
 # Load all custom functions from the "data_preparation.R" script.
-# This allows us to use functions such as prepare_2d_array(), save_dataset(),
-# run_gpa(), and plot_landmarks() in the current analysis script.
-source(file.path(paths$functions, "data_preparation_20251224.R"))
+# This allows us to use the function prepare_2d_array()
+source(here::here("src", "functions", "data_preparation_20251224.R"))
 
 ## 04.02.02.01 PREPARE FULL DATASET --------------------------------------------
 
@@ -31,11 +34,14 @@ source(file.path(paths$functions, "data_preparation_20251224.R"))
 forewing_2d <- prepare_2d_array(forewing_gpa, specimen, 20)
 
 # Export forewing data
-write.csv(forewing_2d, 
-          file = paste0(processed_data, 
-          "forewing_2d_", 
-          format(Sys.time(), "%Y%m%d"), ".csv"), 
-          row.names = TRUE)
+write.csv(
+  forewing_2d,
+  file = here::here(
+    "data", "processed",
+    paste0("forewing_2d_", format(Sys.time(), "%Y%m%d"), ".csv")
+  ),
+  row.names = TRUE
+)
 
 #### Hindwing data ----
 
@@ -43,11 +49,14 @@ write.csv(forewing_2d,
 hindwing_2d <- prepare_2d_array(hindwing_gpa, specimen, 22)
 
 # Export hindwing data
-write.csv(hindwing_2d, 
-          file = paste0(processed_data, 
-          "hindwing_2d_", 
-          format(Sys.time(), "%Y%m%d"), ".csv"), 
-          row.names = TRUE)
+write.csv(
+  hindwing_2d,
+  file = here::here(
+    "data", "processed",
+    paste0("hindwng_2d_", format(Sys.time(), "%Y%m%d"), ".csv")
+  ),
+  row.names = TRUE
+)
 
 ## 04.03.03.01 PREPARE DATA WITH OUTLIER WITHIN SPECIES REMOVED ----------------
 
@@ -73,11 +82,14 @@ hwSpOut_gpa <- gpagen(hwSpOut, curves = NULL, surfaces = NULL, PrinAxes = TRUE,
 fwSpOut_2d <- prepare_2d_array(fwSpOut_gpa, specimen, 20)
 
 # Export forewing data
-write.csv(fwSpOut_2d, 
-          file = paste0(processed_data, 
-          "fwSpOut_2d_", 
-          format(Sys.time(), "%Y%m%d"), ".csv"), 
-          row.names = TRUE)
+write.csv(
+  fwSpOut_2d,
+  file = here::here(
+    "data", "processed",
+    paste0("fwSpOut_2d_", format(Sys.time(), "%Y%m%d"), ".csv")
+  ),
+  row.names = TRUE
+)
 
 ##### Hindwing data ----
 
@@ -85,11 +97,14 @@ write.csv(fwSpOut_2d,
 hwSpOut_2d <- prepare_2d_array(hwSpOut_gpa, specimen, 22)
 
 # Export
-write.csv(hwSpOut_2d, 
-          file = paste0(processed_data, 
-          "hwSpOut_2d_", 
-          format(Sys.time(), "%Y%m%d"), ".csv"), 
-          row.names = TRUE)
+write.csv(
+  hwSpOut_2d,
+  file = here::here(
+    "data", "processed",
+    paste0("hwSpOut_2d_", format(Sys.time(), "%Y%m%d"), ".csv")
+  ),
+  row.names = TRUE
+)
 
 ## 04.03.04.01 PREPARE DATA WITH OUTLIER WITHIN SEXES REMOVED ------------------
 
@@ -110,12 +125,15 @@ hwSxOut_gpa <- gpagen(hwSxOut, curves = NULL, surfaces = NULL, PrinAxes = TRUE,
 # Convert data into dataframe
 fwSxOut_2d <- prepare_2d_array(fwSxOut_gpa, specimen, 20)
 
-# Export forewing data
-write.csv(fwSxOut_2d, 
-          file = paste0(processed_data, 
-          "fwSxOut_2d_", 
-          format(Sys.time(), "%Y%m%d"), ".csv"), 
-          row.names = TRUE)
+# Export
+write.csv(
+  fwSxOut_2d,
+  file = here::here(
+    "data", "processed",
+    paste0("fwSxOut_2d_", format(Sys.time(), "%Y%m%d"), ".csv")
+  ),
+  row.names = TRUE
+)
 
 ##### Hindwing data ----
 
@@ -123,11 +141,14 @@ write.csv(fwSxOut_2d,
 hwSxOut_2d <- prepare_2d_array(hwSxOut_gpa, specimen, 22)
 
 # Export
-write.csv(hwSxOut_2d, 
-          file = paste0(processed_data, 
-          "hwSxOut_2d_", 
-          format(Sys.time(), "%Y%m%d"), ".csv"), 
-          row.names = TRUE)
+write.csv(
+  hwSxOut_2d,
+  file = here::here(
+    "data", "processed",
+    paste0("hwSxOut_2d_", format(Sys.time(), "%Y%m%d"), ".csv")
+  ),
+  row.names = TRUE
+)
 
 ## 04.04.01.01 CREATION OF GEOMORPH DATA FRAME ---------------------------------
 
@@ -245,18 +266,28 @@ plot(mshape(hindwing_gpa$coords), links = hw_links)
 ### Figure for manuscript (high resolution TIFF) ----
 
 # Export High Resolution TIFF
-tiff(file.path(output_figs, "forewing_plot.tiff"),
-     width = 1692, height = 875, units = "px",
-     res = 600, compression = "lzw")
+tiff(
+  filename = here::here("output", "figures", "forewing_plot.tiff"),
+  width = 1692,
+  height = 875,
+  units = "px",
+  res = 600,
+  compression = "lzw"
+)
 
 # Hindwing mean shape
 plot(mshape(hindwing_gpa$coords), links = hw_links)
 dev.off()
 
 # Export High Resolution TIFF
-tiff(file.path(output_figs, "hindwing_plot.tiff"),
-     width = 1692, height = 875, units = "px",
-     res = 600, compression = "lzw")
+tiff(
+  filename = here::here("output", "figures", "hindwing_plot.tiff"),
+  width = 1692,
+  height = 875,
+  units = "px",
+  res = 600,
+  compression = "lzw"
+)
 
 # Hindwing mean shape
 plot(mshape(hindwing_gpa$coords), links = hw_links)

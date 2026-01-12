@@ -1,7 +1,7 @@
 ## ========================================================================== ##
 ## Script:      05_orthetrum_wings_forewing_allometry.R
 ## Author:      Matteo Zinni
-## Date:        2025-01-03
+## Date:        2026-01-12
 ## Description: Allometric analysis of Orthetrum forewing shape using
 ##              geometric morphometrics. The script investigates centroid
 ##              size variation and size–shape relationships across species
@@ -11,11 +11,15 @@
 # 05.01.01.01 FOREWING ANALYSIS ------------------------------------------------
 
 # Packages loading ----
-message("Loading packages: ", paste(packages, collapse = ", "))
-invisible(lapply(packages, function(pkg) {
-  if (!requireNamespace(pkg, quietly = TRUE)) install.packages(pkg)
-  library(pkg, character.only = TRUE)
-}))
+if (!requireNamespace("here", quietly = TRUE)) {
+  install.packages("here")
+}
+
+# Sourcing the function
+source(here::here("src", "functions", "packages_setup_20260111.R"))
+
+# Lunch the function
+install_packages()
 
 ## 05.01.01.01 CENTROID SIZE ---------------------------------------------------
 
@@ -241,11 +245,6 @@ summary(fit02_03)
 # Comparing models with anova: fit02_02 (unique) is the best candidate
 anova(fit02_00, fit02_01, fit02_02, fit02_03)
 
-# Pairwise comparison
-fwSpOut_pw = pairwise(fit02_02, 
-                      groups = fwSpOut_gdf$Species, 
-                      covariate = log(fwSpOut_gdf$Csize))
-
 ## 05.02.03.02 Pairwise comparison of allometric trajectories ----
 
 # Compute pairwise comparisons of unique allometric slopes among species
@@ -322,18 +321,18 @@ anova(fit03_01, fit03_02, fit03_03)
 ## 05.02.04.02 Pairwise comparison of allometric trajectories ----
 
 # Compute pairwise comparisons of unique allometric slopes among species
-fwSpOut_pw <- pairwise(fit03_02, 
-                       groups = fwSpOut_gdf$Species, 
-                       covariate = log(fwSpOut_gdf$Csize))
+fwSxOut_pw <- pairwise(fit03_02, 
+                       groups = fwSxOut_gdf$Species, 
+                       covariate = log(fwSxOut_gdf$Csize))
 
 # Differences in slope vector length
-summary(fwSpOut_pw, confidence = 0.95, test.type = "dist", stat.table = FALSE)
+summary(fwSxOut_pw, confidence = 0.95, test.type = "dist", stat.table = FALSE)
 
 # Differences in slope vector correlation (VC = vector correlation)
-summary(fwSpOut_pw, confidence = 0.95, test.type = "VC", stat.table = FALSE)
+summary(fwSxOut_pw, confidence = 0.95, test.type = "VC", stat.table = FALSE)
 
 # Differences in directional vector (DL = direction length)
-summary(fwSpOut_pw, confidence = 0.95, test.type = "DL", stat.table = FALSE)
+summary(fwSxOut_pw, confidence = 0.95, test.type = "DL", stat.table = FALSE)
 
 ## 04.05.01.01 PLOT AND DATA VISUALIZATION -------------------------------------
 
@@ -393,27 +392,3 @@ plot(fit03_02,
      col = fwSxOut_gdf$Species,
      xlab = "Log of Centroid size",
      type = "regression")
-
-### 04.05.01.04 Checks model fit with diagnostic plots -------------------------
-
-# Checks model fit with diagnostic plots similar to lm diagnostics:
-# highlights residuals, leverage, outliers, and potential issues in
-# the multivariate fit. Useful for assessing model reliability.
-
-### Full dataset -----
-plot(fit01_02, 
-     reg.type = "diagnostics", 
-     predictor = forewing_gdf$Csize,
-     col = forewing_gdf$Species)
-
-### Dataset without species outliers -----
-plot(fit02_02, 
-     reg.type = "diagnostics", 
-     predictor = fwSpOut_gdf$Csize,
-     col = fwSpOut_gdf$Species)
-
-### Dataset without species outliers -----
-plot(fit03_02, 
-     reg.type = "diagnostics", 
-     predictor = fwSxOut_gdf$Csize,
-     col = fwSxOut_gdf$Species)

@@ -9,11 +9,15 @@
 # 03.01.01.01 OUTLIER DETECTION ------------------------------------------------
 
 # Packages loading ----
-message("Loading packages: ", paste(packages, collapse = ", "))
-invisible(lapply(packages, function(pkg) {
-  if (!requireNamespace(pkg, quietly = TRUE)) install.packages(pkg)
-  library(pkg, character.only = TRUE)
-}))
+if (!requireNamespace("here", quietly = TRUE)) {
+  install.packages("here")
+}
+
+# Sourcing the function
+source(here::here("src", "functions", "packages_setup_20260111.R"))
+
+# Lunch the function
+install_packages()
 
 ## 03.01.02.01 LOOKING FOR OUTLIER ---------------------------------------------
 # NOTE: inspect.outliers = TRUE enables interactive inspection;
