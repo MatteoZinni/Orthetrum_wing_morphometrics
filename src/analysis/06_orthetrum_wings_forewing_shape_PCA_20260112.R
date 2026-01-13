@@ -1,7 +1,7 @@
 ## ========================================================================== ##
-## Script:       06_orthetrum_wings_forewing_shape_PCA_20260112.              ##
-## Author:       Matteo Zinni                                                 ##
-## Date:         2026-01-12                                                   ##
+## Script:       06_orthetrum_wings_forewing_shape_PCA_20260112.              
+## Author:       Matteo Zinni                                                 
+## Date:         2026-01-12                                                   
 ## Description:  A geometric morphometrics approach to investigate
 ##               major axes of forewing shape variation in Orthetrum,
 ##               and their taxonomic and biological meaning.
