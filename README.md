@@ -16,5 +16,15 @@ The abstract of the article is reported below.
 ## Repository contents
 
 ```text
-src/analysis     R scripts for geometric morphometric analyses  
-src/functions    Custom R functions  
+src/
+ ├─ analysis/        R scripts for data processing and geometric morphometric analyses
+ └─ functions/       Custom R functions used across analyses
+
+data/
+ ├─ raw/             Raw landmark and specimen data (TPS and CSV formats)
+ └─ processed/       Processed datasets used for statistical analyses
+
+README.md            Repository overview and usage instructions
+abstract.md          Full article abstract
+LICENSE              Usage license
+required_packages.txt List of R package dependencies 
